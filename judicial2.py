@@ -74,11 +74,58 @@ async def new_website():
     # print(header_texts)
     # print(values)
 
-    with open('output4.csv', 'w', newline='') as csvfile:
+    with open('output3.csv', 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(header_texts)
         for row in values:
             writer.writerow(row)
+
+    with open('output3.csv', 'r') as csvfile:
+        reader = csv.reader(csvfile)
+        next(reader)  # Skip the header row if present
+        count = 1
+        valueoflink = []
+        for row in reader:
+            # Assuming the link is in the last column of the CSV
+            link = row[-1]
+            await page.goto(link)
+            # Get the <span> element within the <div> by class name
+            span_element = await page.querySelector('div.ssCaseDetailCaseNbr span')
+
+            span_text = await page.evaluate('(element) => element.textContent', span_element)
+            cdisp_element = await page.querySelector('#CDisp')
+
+            # Get the text contents of the children elements within the tbody using XPath
+            text_contents = await page.evaluate('''() => {
+                                                    let items = document.querySelector('body > table:nth-child(9) > tbody')
+                                                    let item_children = items.childNodes
+                                                    let a = []
+                                                    item_children.forEach(x=> a.push(x.textContent))
+                                                    text = a.join(" , ")
+                                                    return text
+
+    }''')
+
+            text_contents = ' '.join(
+                text_contents.split()).replace('\xa0', ' ')
+
+            if cdisp_element:
+                valueoflink.append([span_text, text_contents])
+            else:
+                valueoflink.append([span_text, 'No Information'])
+
+            count += 1
+            if count == 1000:
+                break
+
+    # Save the rows to a CSV file
+    with open('output4.csv', 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(['Case number', 'Informations'])
+        for row in valueoflink:
+            writer.writerow(row)
+
+    await browser.close()
 
 
 asyncio.get_event_loop().run_until_complete(new_website())
