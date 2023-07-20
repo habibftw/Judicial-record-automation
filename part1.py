@@ -8,7 +8,7 @@ async def open_webpage():
     page = await browser.newPage()
     await page.goto('https://judicialrecords.wilco.org/PublicAccess/default.aspx')
 
-    # Wait for the page to load (optional)
+    # Wait for the page to load
     await page.waitForSelector('a')
 
 # Execute JavaScript code to click on the hyperlink
