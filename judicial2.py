@@ -74,7 +74,7 @@ async def new_website():
     # print(header_texts)
     # print(values)
 
-    with open('output.csv', 'w', newline='') as csvfile:
+    with open('output4.csv', 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(header_texts)
         for row in values:
